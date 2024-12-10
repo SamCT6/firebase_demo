@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gtk_flutter/yes_no_selection.dart';
 
 import 'firebase_options.dart';
 import 'guest_book_message.dart';     
@@ -28,9 +29,9 @@ class ApplicationState extends ChangeNotifier {
         .collection('attendees')
         .doc(FirebaseAuth.instance.currentUser!.uid);
     if (attending == Attending.yes) {
-      userDoc.set(<String, dynamic>{'attending': true});
+      userDoc.set(<String, dynamic>{'attending': true, "guest" : 0});
     } else {
-      userDoc.set(<String, dynamic>{'attending': false});
+      userDoc.set(<String, dynamic>{'attending': false, "guest":0});
     }
   }
 
@@ -49,12 +50,16 @@ class ApplicationState extends ChangeNotifier {
       EmailAuthProvider(),
     ]);
 
+
+    
+
+
     FirebaseFirestore.instance
         .collection('attendees')
         .where('attending', isEqualTo: true)
         .snapshots()
         .listen((snapshot) {
-      _attendees = snapshot.docs.length;
+      _attendees = snapshot.docs.first.data()["guests"];
       notifyListeners();
     });
 

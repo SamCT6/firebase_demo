@@ -1,14 +1,40 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart'
+    hide EmailAuthProvider, PhoneAuthProvider;
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'app_state.dart';
 import 'src/widgets.dart';
 
+int guests = 0;
+
+
 class YesNoSelection extends StatelessWidget {
+  
   const YesNoSelection(
       {super.key, required this.state, required this.onSelection});
   final Attending state;
   final void Function(Attending selection) onSelection;
+  
 
+  void addGuest (){
+    FirebaseFirestore.instance.collection("attendees").doc(FirebaseAuth.instance.currentUser!.uid).set({
+      'attending': true,
+      "guests": guests
+  });
+  }
+  void noGuest (){
+    FirebaseFirestore.instance.collection("attendees").doc(FirebaseAuth.instance.currentUser!.uid).set({
+      'attending': false,
+      "guests": 0
+  });
+  }
+
+  
   @override
   Widget build(BuildContext context) {
     switch (state) {
@@ -17,15 +43,22 @@ class YesNoSelection extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Row(
             children: [
-              FilledButton(
-                onPressed: () => onSelection(Attending.yes),
-                child: const Text('YES'),
+              SizedBox(
+                height: 50,
+                width: 100,
+                child: TextField(
+                decoration: InputDecoration(hintText: "How many guest?"),
+                onChanged: (value) {
+                  guests = int.parse(value);
+                } ,
+              ),
               ),
               const SizedBox(width: 8),
               TextButton(
-                onPressed: () => onSelection(Attending.no),
+                onPressed: (noGuest),
                 child: const Text('NO'),
               ),
+              TextButton(onPressed: addGuest, child: Text("Enter"))
             ],
           ),
         );
@@ -43,6 +76,7 @@ class YesNoSelection extends StatelessWidget {
                 onPressed: () => onSelection(Attending.no),
                 child: const Text('NO'),
               ),
+              
             ],
           ),
         );
@@ -60,6 +94,7 @@ class YesNoSelection extends StatelessWidget {
                 onPressed: () => onSelection(Attending.no),
                 child: const Text('NO'),
               ),
+              
             ],
           ),
         );
