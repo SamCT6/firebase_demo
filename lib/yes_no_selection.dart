@@ -28,9 +28,12 @@ class YesNoSelection extends StatelessWidget {
   });
   }
   void noGuest (){
+    guests = 0;
+    addGuest();
     FirebaseFirestore.instance.collection("attendees").doc(FirebaseAuth.instance.currentUser!.uid).set({
       'attending': false,
-      "guests": 0
+      "guests": guests,
+      
   });
   }
 
@@ -76,7 +79,6 @@ class YesNoSelection extends StatelessWidget {
                 onPressed: () => onSelection(Attending.no),
                 child: const Text('NO'),
               ),
-              
             ],
           ),
         );

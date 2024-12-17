@@ -49,17 +49,16 @@ class ApplicationState extends ChangeNotifier {
     FirebaseUIAuth.configureProviders([
       EmailAuthProvider(),
     ]);
-
-
-    
-
-
     FirebaseFirestore.instance
         .collection('attendees')
         .where('attending', isEqualTo: true)
         .snapshots()
         .listen((snapshot) {
-      _attendees = snapshot.docs.first.data()["guests"];
+          _attendees = 0;
+      for(var doc in snapshot.docs){
+        String guest = doc.data()["guests"].toString();
+        _attendees += int.parse(guest);
+      }
       notifyListeners();
     });
 
